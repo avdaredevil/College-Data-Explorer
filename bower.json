@@ -36,6 +36,10 @@
     "vaadin-grid": "^1.2.0",
     "paper-input": "^1.1.22",
     "vaadin-combo-box": "^1.1.5",
-    "paper-slider": "PolymerElements/paper-slider#^1.0.12"
+    "paper-slider": "PolymerElements/paper-slider#^1.0.12",
+    "highcharts": "^5.0.0"
+  },
+  "resolutions": {
+    "highcharts": "^5.0.0"
   }
 }
