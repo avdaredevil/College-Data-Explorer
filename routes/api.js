@@ -104,9 +104,5 @@ router.get("/getData", function(req, res) {
     runQuery(query,[Number(q.minTuition||0),Number(q.maxTuition||Number.MAX_SAFE_INTEGER)].concat(wh.v))
         .then(rows => res.json({rows: rows, query: query}))
 })
-router.get("/Remove-Video/:vid", function(req, res) {
-    //TODO: Implement this route
-    res.json({na:"na","naa":"naa",bat:"man"})
-})
 router.use(function(req, res, next) {APIErr(res, "Invalid API call", 403)});
 module.exports = router;
