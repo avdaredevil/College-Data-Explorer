@@ -65,6 +65,9 @@ html
                 --paper-input-container-focus-color: white;
                 --paper-input-container-input-color: white;
             }
+            #Creator {margin-right: .5em}
+            #Creator a {color: inherit;transition: color .25s;text-decoration:none}
+            #Creator:hover a {color: #f1262c}
             paper-slider ::content .slider-input {width: 117px}
         template#app(is="dom-bind")
             paper-header-panel(type="waterfall")
@@ -72,7 +75,7 @@ html
                     paper-icon-button(hidden$="[[!thin]]",icon="[[ternary(openMenu,'arrow-back','menu')]]",on-tap="toggleSidebar")
                     h1 College Data Examiner
                     .flex
-                    small: i Made by 
+                    small#Creator: i Made by 
                         a(href="https://www.linkedin.com/in/apoorvverma",target="_blank") Apoorv Verma [AP]
                     iron-icon(icon="social:person")
                 paper-drawer-panel#drawer(narrow="{{thin}}",selected="{{panel}}")
