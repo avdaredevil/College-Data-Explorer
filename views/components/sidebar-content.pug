@@ -12,11 +12,13 @@ dom-module#sidebar-content
             a(href="[[item.link]]"): paper-icon-item
                 iron-icon(icon="[[item.icon]]",item-icon)
                 span [[item.text]]
+                paper-ripple
         .div Statistics
         template(is="dom-repeat", items="[[stats]]")
             a(href="[[item.link]]"): paper-icon-item
                 iron-icon(icon="[[item.icon]]",item-icon)
                 span [[item.text]]
+                paper-ripple
     script: :uglify-js:babel
         Polymer({
             is: "sidebar-content",
