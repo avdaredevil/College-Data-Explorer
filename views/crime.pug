@@ -1,0 +1,42 @@
+extends layout
+
+block style
+    style(is="custom-style"): :clean-css
+        h2 {font-family:"Raleway";color: white;margin: .5em 0;font-weight: 200}
+        .lhc {@apply(--layout-horizontal);@apply(--layout-center)}
+        .Scroll-Container {padding:1em 2em 1em 1em;overflow:auto}
+        #Nah {color:white;font-family:Poiret One;font-size:2em;margin:0;text-align:center;padding:.5em 0}
+block content
+    iron-ajax(auto,url="/api/stats/Tuition-vs-Crime",last-response="{{crimeTuition}}",on-response="chartSetup")
+    iron-ajax(auto,url="/api/stats/Pop-Crime",last-response="{{popCrime}}",on-response="chartSetup")
+    .fit.Scroll-Container
+        h2 Crime vs Tuition Relationships
+        highcharts-chart#tv(title="Tuition vs Crime Rates",x-label="Tuition",y-label="Violent Crime Rate",legend,type="scatter",data="[[hp(crimeTuition.rows,'tuition','vcrime','state')]]")
+        highcharts-chart#pv(title="Property vs Violent Crimes",x-label="Property Crimes",y-label="Violent Crimes",type="scatter",data="[[hp(crimeTuition.rows,'pcrime','vcrime','state')]]")
+        highcharts-chart#cp(title="Population vs Crime",x-label="Population",y-label="P/V Crimes",type="scatter",data="[[hp(popCrime.rows,'pop','crime','state')]]")
+        h3#Nah No Significant correlations :(
+block script
+    script: :uglify-js:babel
+        const sleep = t => new Promise(res => setTimeout(res,t))
+        t.resizeCharts = _ => $("higcharts-chart").each((_,e) => e.resizeChart())
+        t.chartSetup = _ => {
+            "tv,pv,cp".split(",").forEach(k => {
+                const ch = t.$[k]
+                if (ch._chart.series.length == 1) {
+                    k == "tv" && t.crimeTuition && ch.addSeries("Property Crime Rate",t.hp(t.crimeTuition.rows,'tuition','pcrime','state'))
+                    ;[0,1].forEach(i => ch.updateSeries({
+                        tooltip: {
+                            headerFormat: "",
+                            pointFormat: [
+                                "<span style=\"color:{point.color}\">\u25CF</span> {point.name}:",
+                                "<b>{point.xl}</b> "+(k=="tv"?"$":'')+"{point.x}",
+                                "<b>{point.yl}</b> {point.y}",
+                            ].join("<br>")
+                        }
+                    },i))
+                }
+            })
+            t.resizeCharts()
+        }
+        t.hp = (d,x,y,l) => d.map(p => ({x: p[x], y: p[y], name: p[l], xl: x, yl: y}))
+        t.commaFmt = x => ((ch,mt) => ch.replace(/\B(?=(\d{3})+(?!\d))/g, ",")+(mt?"."+mt:''))(...x.toString().split("."))

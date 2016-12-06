@@ -1,0 +1,96 @@
+mixin PolymerImport(el,sub)
+    link(rel="import",href="/assets/"+el+"/"+(sub||el)+".html")
+mixin MyComponent(el)
+    link(rel="import",href="/Get-Component/"+el)
+
+doctype html
+html
+    head
+        title College Explorer
+        meta(name='viewport', content='width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes')
+        script(src="/assets/webcomponentsjs/webcomponents-lite.min.js")
+        +PolymerImport("iron-ajax")
+        +PolymerImport("iron-icon")
+        +PolymerImport("iron-icons")
+        +PolymerImport("iron-icons","av-icons")
+        +PolymerImport("iron-icons","social-icons")
+        +PolymerImport("iron-flex-layout","iron-flex-layout-classes")
+        +PolymerImport("paper-item","paper-icon-item")
+        +PolymerImport("paper-card")
+        +PolymerImport("paper-badge")
+        +PolymerImport("paper-input")
+        +PolymerImport("paper-toast")
+        +PolymerImport("paper-slider")
+        +PolymerImport("paper-button")
+        +PolymerImport("paper-dialog")
+        +PolymerImport("paper-toolbar")
+        +PolymerImport("paper-progress")
+        +PolymerImport("paper-icon-button")
+        +PolymerImport("paper-header-panel")
+        +PolymerImport("paper-drawer-panel")
+        //- Custom Fetches
+        +PolymerImport("vaadin-grid")
+        +PolymerImport("vaadin-combo-box")
+        +PolymerImport("highcharts-chart")
+        +PolymerImport("highcharts-chart","highcharts-map")
+        +MyComponent("sidebar-content")
+        link(rel='import', href='/assets/highcharts-theme.html')
+        link(rel="stylesheet",href='/assets/gmail-scrollbar.css')
+        link(rel="stylesheet",href='https://fonts.googleapis.com/css?family=Raleway|Poiret+One')
+        script(src='/socket.io/socket.io.js')
+        style: :clean-css
+            html,body,head {margin:0;border:0;padding:0;font-family: Roboto}
+            * {box-sizing: border-box}
+    body.fullbleed
+        style(is="custom-style",include="iron-flex iron-flex-factors iron-flex-alignment iron-positioning")
+        style: :clean-css
+            body {background-color: #252526/*#f1f1f1*/}
+            main {padding: 1em}
+            h1,h2,h3 {font-weight:200}
+            #toolbar {font-family: Poiret One;background-color: #0D0F0F}
+            paper-button {background-color: #2196F3 !important;color: white}
+            img {display:block}
+            #Search #input {background-color: transparent;color:inherit}
+        style(is="custom-style"): :clean-css
+            paper-drawer-panel {--paper-drawer-panel-left-drawer-container: {background-color: #1f1d1d}}
+            #navShadow {position:absolute;height:100%;right:0}
+            #logo {width: 9em}
+            #logo[thin] {width: 2.75em;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}
+            #Search {min-width:17em;width:90%;max-width: 29em;margin:auto;background-color: rgba(255,255,255,.14);color:white}
+            #Search {--background-color: transparent}
+            #main {overflow: auto}
+            sidebar-content {overflow: auto}
+            vaadin-combo-box,paper-slider {
+                --paper-color: #b6181d;
+                --paper-input-container-focus-color: white;
+                --paper-input-container-input-color: white;
+            }
+            paper-slider ::content .slider-input {width: 117px}
+        template#app(is="dom-bind")
+            paper-header-panel(type="waterfall")
+                paper-toolbar#toolbar
+                    paper-icon-button(hidden$="[[!thin]]",icon="[[ternary(openMenu,'arrow-back','menu')]]",on-tap="toggleSidebar")
+                    h1 College Data Examiner
+                    .flex
+                    iron-icon(icon="social:person")
+                paper-drawer-panel#drawer(narrow="{{thin}}",selected="{{panel}}")
+                    nav(drawer)
+                        sidebar-content.fit(pc="[[pc]]")
+                        #navShadow
+                    main#main.fit.layout.vertical.around-justified(main)
+                        block content
+            dummy-listener(prop="[[setPanelState(thin,panel)]]")
+            paper-toast#status
+            paper-toast#error
+            block parent_content
+        script: :uglify-js:babel
+            var t = document.querySelector("#app")
+            t.io = io()
+            t.openMenu = false
+            t.ternary = (a,b,c) => a?b:c
+            t.setPanelState = (n,p) => {t.openMenu = n&&p=="drawer"}
+            t.toggleSidebar = _ => t.$.drawer.togglePanel()
+            t.searchQuery = ""
+            t.searchResults = {data: []}    
+        block style
+        block script

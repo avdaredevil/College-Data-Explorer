@@ -1,0 +1,45 @@
+extends layout
+
+block style
+    style(is="custom-style"): :clean-css
+        h2 {font-family:"Raleway";color: white;margin: .5em 0;font-weight: 200}
+        .lhc {@apply(--layout-horizontal);@apply(--layout-center)}
+        .Scroll-Container {padding:1em 2em 1em 1em;overflow:auto}
+        highcharts-chart {padding:.5em;width: 50%;height:21em;min-height:initial;--highcharts-container: {height: 100%}}
+        #Stats {color: white;padding:}
+        #Stats .stat .desc {font-family:Poiret One}
+        #Stats .stat .desc h3 {margin:0;font-weight:700;width:9em}
+        #Stats .stat .desc .num {font-size:1.2em;margin-left:.5em;font-family:Raleway}
+block content
+    iron-ajax(auto,url="/api/stats/Sector-Tuition",last-response="{{sectors}}",on-response="chartSetup")
+    iron-ajax(auto,url="/api/stats/Calendar-Types",last-response="{{caltype}}")
+    iron-ajax(auto,url="/api/stats/All-Stats",last-response="{{allStats}}")
+    .fit.Scroll-Container
+        h2 Quick Stats and Overview
+        highcharts-chart(title="Sectors vs Tuition",color-by-point,x-label="Sector",y-label="Tuition",x-axis="[[xAxis(sectors.rows,'sector')]]",type="column",data="[[col(sectors.rows,'tuition')]]")
+        highcharts-chart(title="Calendar Type Frequency",color-by-point,label="Calendar Type",type="pie",data="[[zipCol(caltype.rows,'calendar_type','count')]]")
+        footer#Stats
+            template(is="dom-repeat",items="[[getKeys(allStats)]]")
+                paper-icon-item.stat
+                    iron-icon(icon="trending-up",item-icon)
+                    .desc.lhc
+                        h3 [[item.key]]: 
+                        .num [[item.val]]
+block script
+    script: :uglify-js:babel
+        const sleep = t => new Promise(res => setTimeout(res,t))
+        t.resizeCharts = _ => $("higcharts-chart").each((_,e) => e.resizeChart())
+        t.xAxis = (d,c) => ({categories: t.col(d,c)})
+        t.chartSetup = _ => {t.resizeCharts()}
+        t.zipCol = (d,x,y) => d.map(r => [r[x], r[y]])
+        t.col = (d,y) => d.map(p => p[y])
+        t.getKeys = d => {
+            const trans = {
+                maxT: "Maximum Tuition",
+                minT: "Minimum Tuition",
+                maxC: "Maximum Crime",
+                minC: "Minimum Crime",
+            }
+            return Object.keys(d).map(k => ({key: trans[k], val: d[k]}))
+        }
+        t.commaFmt = x => ((ch,mt) => ch.replace(/\B(?=(\d{3})+(?!\d))/g, ",")+(mt?"."+mt:''))(...x.toString().split("."))

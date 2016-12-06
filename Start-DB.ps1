@@ -1,0 +1,1 @@
+start mysqld "--defaults-file=sql.conf --console"

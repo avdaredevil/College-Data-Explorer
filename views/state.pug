@@ -1,0 +1,102 @@
+extends layout
+
+block style
+    style(is="custom-style"): :clean-css
+        h2 {font-family:"Raleway";color: white;margin: .5em 0;font-weight: 200}
+        #State {color: white}
+        #State .Error {width:100%;font-size:1.5em;height:8em;text-align:center}
+        #State .Error h2 {font-family: "Poiret One"}
+        #State .stat {width: 50%;display: inline-flex}
+        #State .stat .desc {font-family:Poiret One}
+        #State .stat .desc h3 {margin:0;font-weight:700;width:9em}
+        #State .stat .desc .num {margin-left:.5em;font-family:Raleway}
+        .lhc {@apply(--layout-horizontal);@apply(--layout-center)}
+        .Scroll-Container {padding:1em 2em 1em 1em;overflow:auto}
+block content
+    script(src="https://code.highcharts.com/mapdata/countries/us/us-all.js")
+    iron-ajax(auto,url="/api/getStateDensity",last-response="{{stateCollege}}",on-response="setupMap")
+    iron-ajax(auto="[[currState]]",url="/api/getStateInformation/[[currState]]",last-response="{{stateData}}")
+    .fit.Scroll-Container
+        h2 State Tuition/Crime Explorer
+            span(hidden$="[[stateData.isNotLoaded]]")  - 
+                i [[stateData.name]]
+        highcharts-map#Map(title="College Data",legend,highchart-options="[[otherOptions]]",on-drill-down="loadColleges")
+        header#State(hidden$="[[stateData.isNotLoaded]]")
+            footer.Error.layout.vertical.center-center(hidden$="[[!stateData.noData]]")
+                h2 No Data available for this state :(
+            template(is="dom-repeat",items="[[getStateKeys(stateData)]]")
+                paper-icon-item.stat
+                    iron-icon(icon="trending-up",item-icon)
+                    .desc.lhc
+                        h3 [[item.key]]: 
+                        .num [[item.val]]
+block script
+    script: :uglify-js:babel
+        const sleep = t => new Promise(res => setTimeout(res,t))
+        t.loadColleges = c => {
+            const state = c.detail.e.point.code
+            t.currState = state
+        }
+        t.stateData = {isNotLoaded: true}
+        t.otherOptions = {
+            colorAxis: {
+                min: 1,
+                type: 'logarithmic',
+                minColor: '#EEEEFF',
+                maxColor: '#000022',
+                stops: [
+                    [0, '#EFEFFF'],
+                    [0.67, '#4444FF'],
+                    [1, '#000022']
+                ]
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                shadow: false,
+                verticalAlign: 'middle',
+                backgroundColor: "transparent",
+                floating: false,
+            },
+        }
+        t.getStateKeys = d => {
+            if (d.isNotLoaded) {return}
+            const trans = {
+                population: "Population",
+                violent_crime_rate: "Violent Crime Rate",
+                murder_rate: "Murder Rate",
+                rape_rate: "Rape Rate",
+                robbery_rate: "Robbery Rate",
+                aggravated_assault_rate: "Assault Rate",
+                property_crime_rate: "Property Crime",
+                burglary_rate: "Burglary Rate",
+                theft_rate: "Theft Rate",
+                motor_theft_rate: "Motor Vehicle Theft Rate",
+                colleges: "Colleges",
+                avg_tuition: "Average Tuition"
+            }, ans = [];
+            Object.keys(d).forEach(k => {
+                const tx = trans[k];if (!tx) {return}
+                let val=t.commaFmt(d[k]);k=="avg_tuition" && (val = "$"+val)
+                tx && ans.push({key: tx, val: val})
+            })
+            return ans
+        }
+        t.setupMap = _ => {
+            sleep(20).then(_ => t.$.Map.updateSeries({
+                animation: {duration: 1000},
+                data: t.stateCollege.rows,
+                mapData: Highcharts.maps['countries/us/us-all'],
+                joinBy: ['postal-code', 'code'],
+                dataLabels: {
+                    enabled: true,
+                    color: '#FFFFFF',
+                    format: '{point.code}'
+                },
+                name: 'College Density',
+                tooltip: {
+                    pointFormat: '<b>{point.code}</b>: {point.value} colleges'
+                },
+            })).then(_ => t.$.Map.resizeChart())
+        }
+        t.commaFmt = x => ((ch,mt) => ch.replace(/\B(?=(\d{3})+(?!\d))/g, ",")+(mt?"."+mt:''))(...x.toString().split("."))

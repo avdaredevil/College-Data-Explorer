@@ -1,0 +1,39 @@
+extends layout
+
+block style
+    style: :clean-css
+        h2 {font-family:"Raleway";color: white;margin: .5em 0;font-weight: 200}
+        #Controls {color: white}
+        #Controls vaadin-combo-box {width:48%;display:inline-block;margin:0 .5em}
+        #Controls .Slider {width:100%;padding: 0 .5em}
+        #Controls .Slider h3 {margin:0;font-size:.9em}
+block content
+    iron-ajax(auto,url="/api/getTuitionStats",last-response="{{tuition}}",on-response="setMax")
+    iron-ajax(auto,url="/api/getStates",last-response="{{states}}")
+    iron-ajax(auto,url="/api/getSectors",last-response="{{sectors}}")
+    iron-ajax(auto,url="/api/getData?state=[[state]]&sector=[[sector]]&minTuition=[[minTuition]]&maxTuition=[[maxTuition]]",debounce-duration="250",last-response="{{searchData}}")
+    h2 Interactive Data viewer
+    header#Controls
+        vaadin-combo-box(label="State",items="[[states.rows]]",value="{{state}}")
+        vaadin-combo-box(label="Sector",items="[[sectors.rows]]",value="{{sector}}")
+        aside.Slider.layout.horizontal.center
+            h3 Minimum Tuition
+            paper-slider.flex(pin,editable,min="[[tuition.min]]",max='[[tuition.max]]', value='{{minTuition}}')
+        aside.Slider.layout.horizontal.center
+            h3 Maximum Tuition
+            paper-slider.flex(pin,editable,min="[[tuition.min]]",max='[[tuition.max]]', value='{{maxTuition}}')
+    .flex
+    vaadin-grid(items='[[searchData.rows]]', visible-rows=8, column-reordering-allowed)
+        table
+            colgroup
+                col(name='college', sortable, resizable)
+                col(name='sector', sortable, resizable)
+                col(name='state', sortable)
+                col(name='2011_12_price', sortable)
+                col(name='2013_14_price', sortable)
+                col(name='price_pct_change', sortable)
+block script
+    script: :uglify-js:babel
+        t.mult = (a,b) => a*b
+        t.countOf = d => (d||[]).length
+        t.setMax = _ => {t.maxTuition = t.tuition.max}
