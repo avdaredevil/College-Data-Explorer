@@ -1,7 +1,6 @@
 ﻿# College Data Examiner
 > Exploratory Dashboard to view College Data and it's relationships with Crime Data
-> #### [DEMO LINK](https://temporary-demo-db.herokuapp.com)
-> #### [PowerPoint](https://github.com/avdaredevil/College-Data-Explorer/raw/master/PPT.pptx)
+> #### [DEMO LINK](https://temporary-demo-db.herokuapp.com) | [POWERPOINT](https://github.com/avdaredevil/College-Data-Explorer/raw/master/PPT.pptx)
 
 ## Features
 > Lot's of added functionality and features:
