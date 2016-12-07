@@ -13,6 +13,9 @@
 ## Disclaimer
 > For best results please use the latest version of Google Chrome
 
+## ER Diagram
+> ![Er Diagram](https://cloud.githubusercontent.com/assets/5303018/20952985/5681c4de-bbfe-11e6-838f-9194c0a62038.png)
+
 ## Tables
 >
 name | rows
