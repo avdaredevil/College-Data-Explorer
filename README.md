@@ -19,7 +19,7 @@ name | rows
 ---  | ---
 _**colleges**_ | `id*`,`sector**`,`name`,`state**`,`calendar_type`,`2011_12_price`,`2013_14_price`,`price_pct_change`
 _**sectors**_ | `id*`,`name`
-_**state_crime**_ | `abr*`,`name`,`population`,`violent_crime_rate`,`murder_rate`,`rape_rate`,`robbery_rate`,`aggravated_assault_rate`,`property_crime_rate`,`burglary_rate`,`theft_rate`,`motor_theft_rate`,`colleges`,`avg_tuition`
+_**state_crime**_ | `abr*`,`name`,`population`,`violent_crime_rate`,`murder_rate`,`rape_rate`,`robbery_rate`,`aggravated_assault_rate`,`property_crime_rate`,`burglary_rate`,`theft_rate`,`motor_theft_rate`
 >
 #### Note:
 - `*` means PK
